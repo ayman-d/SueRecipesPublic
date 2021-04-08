@@ -1,0 +1,92 @@
+﻿@model IndexViewModel;
+
+@{
+    ViewData["Title"] = "User Recipes";
+}
+
+
+<div class="col-xl-8 row m-auto">
+    @foreach (var recipe in Model.Recipe)
+    {
+
+        var spiceImage = "/images/" + recipe.SpiceLevel + ".png";
+        var categoryImage = "/images/" + recipe.Category + ".png";
+
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card" style="border-radius: 0px;">
+                @if (recipe.ImagePath == null)
+                {
+                    <img class="recipe-image" src="~/images/recipe2.jpg" asp-append-version="true" style="height:200px; width:auto; border-radius: 0px;" />
+                }
+                else
+                {
+                    string existingImage = "~/images/" + recipe.ImagePath;
+                    <img class="recipe-image" src="@existingImage" asp-append-version="true" style="height:200px; width:auto; border-radius: 0px;" />
+                }
+
+                <div class="card-body">
+                    <h4 class="card-title text-center" id="recipe-title"
+                        style="height: 60px;">
+                        @if (recipe.Title.Length > 25)
+                        {@($"{recipe.Title.Substring(0, 25)}...") }
+                        else
+                        { @recipe.Title}
+                    </h4>
+                    <p class="card-text" id="recipe-description"
+                       style="font-size: 15px; line-height: 15px; height:90px;">
+                        @if (recipe.Description.Length > 150)
+                        {@($"{recipe.Description.Substring(0,150)}...") }
+                        else
+                        { @recipe.Description}
+                    </p>
+                    @*<p style="font-size: 13px; line-height: 13px; margin: 0;">Posted on @recipe.CreatedOn</p>
+                        <p style="margin: 0;">by <a href="#">@recipe.ApplicationUser.Name</a></p>*@
+                    <div class="row justify-content-between mb-3">
+                        <span class="ml-3 mb-2" style="font-size: 15px; line-height: 13px;">by <a href="#">@recipe.ApplicationUser.Name</a></span>
+                        <span class="mr-3" style="font-size: 15px; line-height: 13px;"><span class="badge badge-dark">@recipe.CreatedOn</span></span>
+                    </div>
+
+                    @if (signInManager.IsSignedIn(User))
+                    {
+                        @if (recipe.Hearts.Any(h => h.ApplicationUserId == signInManager.UserManager.GetUserId(User)))
+                        {
+                            <span>@recipe.Hearts.Count <img src="~/images/full-heart.png" style="height:25px; width: auto; margin-left:-2px;" /> </span>
+                        }
+                        else
+                        {
+                            <span>@recipe.Hearts.Count <img src="~/images/hollow-heart.png" style="height:25px; width: auto; margin-left:-2px;" /> </span>
+                        }
+                    }
+                    else
+                    {
+                        <span>@recipe.Hearts.Count <img src="~/images/full-heart.png" style="height:25px; width: auto; margin-left:-2px;" /> </span>
+                    }
+
+
+
+                    <div class="mt-1 row p-2 justify-content-between">
+                        @if (recipe.MealType.ToString() == "Any")
+                        {
+                            <span class="col-4" style="margin-right:-50px;">Anytime</span>
+                        }
+                        else
+                        {
+                            <span class="col-4" style="margin-right:-50px;">@recipe.MealType</span>
+                        }
+                        <span style="font-size: 22px;" class="ml-4 col-1"> <img src="@categoryImage" style="height:20px; width: auto;" /> </span>
+                        <span style="font-size: 17px; font-weight: bold; margin-right:-40px;" class="ml-3 col-4"> <img src="/images/clock.png" style="height:30px; width: auto;" />@(recipe.PrepTime + recipe.CookTime) </span>
+                        <span style="font-size: 22px;" class="ml-3 col-2"> <img src="@spiceImage" style="height:25px; width: auto;" /> </span>
+                    </div>
+
+                    <div class="row justify-content-between p-2">
+                        <a asp-action="details" asp-controller="home" asp-route-id="@recipe.Id" class="btn btn-info">View</a>
+                        <a asp-action="editrecipe" asp-controller="home" asp-route-recipeId="@recipe.Id" class="btn btn-warning">Edit</a>
+                        <a asp-action="delete" asp-controller="home" asp-route-recipeId="@recipe.Id"
+                           onclick="return confirm('Are you sure you want to delete this recipe?')" class="btn btn-danger">Delete</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>

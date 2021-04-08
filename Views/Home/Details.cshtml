@@ -1,0 +1,308 @@
+﻿@model RecipeDetailViewModel;
+
+@{
+    ViewData["Title"] = "Details";
+    string fullHeartUrl = "/images/full-heart.png";
+    string hollowHeartUrl = "/images/hollow-heart.png";
+    var spiceImage = "/images/" + Model.Recipe.SpiceLevel + ".png";
+    var categoryImage = "/images/" + Model.Recipe.Category + ".png";
+    string currentUser = "";
+    @if (signInManager.IsSignedIn(User))
+    {
+        currentUser = signInManager.UserManager.GetUserId(User);
+    }
+}
+
+@*CSS Link*@
+<link rel="stylesheet" href="~/css/details.css" />
+
+<div class="container m-auto" style="font-family: 'Merriweather', serif; background-color: white;">
+    <div class="shadow p-5" style="background-color: #fffefc; margin-bottom: 80px;">
+        @*Recipe Title*@
+        <p class="recipe-title text-left" style="font-size: 50px;">@Model.Recipe.Title</p>
+        <div style="margin-top: -30px; margin-bottom: 20px;"><small class="font-italic" style="font-weight: 200; color: #999;">@Model.Recipe.CreatedOn</small></div>
+
+        @*Description*@
+        <p class="mt-2 mb-5">@Model.Recipe.Description</p>
+        @*2nd Section*@
+        <div class="row mb-3">
+            @*Image*@
+            <div class="col-xl-6 row">
+                <div class="col-7">
+                    @if (Model.Recipe.ImagePath == null)
+                    {
+                        <img class="recipe-image" style="height: 300px; width: 100%; border-radius: 15px;" src="~/images/recipe2.jpg" asp-append-version="true" />
+                    }
+                    else
+                    {
+                        string existingImage = "~/images/" + Model.Recipe.ImagePath;
+                        <img class="recipe-image" style="height: 300px; width: 100%; border-radius: 15px;" src="@existingImage" asp-append-version="true" />
+                    }
+                </div>
+                @*Summary Box*@
+                <div class="col-5" style="border: 2px solid #aaa; height: 300px; width: 180px; max-width: 300px; padding: 30px; border-radius: 15px;">
+                    @if (Model.Recipe.MealType.ToString() == "Any")
+                    {
+                        <p>Anytime</p>
+                    }
+                    else
+                    {
+                        <p>@Model.Recipe.MealType</p>
+                    }
+                    <p><img src="@categoryImage" style="height:40px; width: auto;" /></p>
+                    <p>Prep <img src="~/images/clock.png" style="height:20px; width: auto;" /> @Model.Recipe.PrepTime</p>
+                    <p>Cook <img src="~/images/clock.png" style="height:20px; width: auto;" /> @Model.Recipe.CookTime</p>
+                    <p>@Model.Recipe.Servings Servings</p>
+                    <p><img src="@spiceImage" style="height: 40px; width: auto;" /></p>
+                </div>
+            </div>
+            <div style="width:100%; padding-top:70px;" class="col-xl-5 text-center">
+                @*ByWho*@
+                <span><img style="height: 25px; width: auto; margin-right: 6px;" src="~/images/33638.svg" /></span>
+                <a asp-action="index" asp-controller="home" asp-route-searchUser="@Model.Recipe.ApplicationUserId">@Model.Recipe.ApplicationUser.Name</a>
+                <div><small class="font-italic" style="font-weight: 200; color: #999;">Click on the author's name to see more of their recipes</small></div>
+                <br />
+                @*Likes*@
+                @if (signInManager.IsSignedIn(User))
+                {
+                    <img class="mr-2" id="like" src="" style="height:25px; width: auto; margin-left:-2px;" /><span id="like-count"></span>
+                    <div><small class="font-italic" style="font-weight: 200; color: #999;">Like the recipe if you like it =)</small></div>
+                }
+                else
+                {
+                    <div class="mb-3">
+                        <img class="mr-2" id="unsigned-like" src="~/images/full-heart.png" style="height:25px; width: auto; margin-left:-2px;" /><span id="like-count"></span>
+                        <div id="like-warning" class="p-2 mt-3" style="height: 45px; line-height: 15px; background-color: #f38185; color: white;
+            border-radius: 5px; display: none; width: max-content; margin: auto;">Please log in to like the recipe!</div>
+                        <div><small class="font-italic" style="font-weight: 200; color: #999;">Like the recipe if you like it =)</small></div>
+                    </div>
+
+                }
+            </div>
+
+
+        </div>
+        <br />
+        <hr style="width: 500px;" />
+
+        @*Ingredients*@
+        <div class="col-12 pl-5 row">
+            <h3 class="col-12" style="font-family: 'Merriweather', serif;">Ingredients</h3>
+            <div class="list-group col-xl-6">
+                @foreach (var ingredient in Model.Recipe.Ingredients)
+                {
+                    <a href="#" class="list-group-item list-group-item-action disabled">
+                        (@ingredient.Measure) @ingredient.Unit<span>(s)</span> of @ingredient.Name
+                    </a>
+                }
+            </div>
+        </div>
+        <br />
+        <hr style="width: 500px;" />
+
+        @*Instructions*@
+        <div class="col-12 pl-5 row">
+            <h3 class="col-12" style="font-family: 'Merriweather', serif;">Instructions</h3>
+            <p style="white-space: pre-line">@Model.Recipe.Instructions</p>
+        </div>
+        <br />
+    </div>
+
+    @*New Comment*@
+    @if (signInManager.IsSignedIn(User) == true)
+    {
+        <div class="p-5">
+            <form enctype="multipart/form-data" asp-action="create" asp-controller="comment" method="post">
+                <div class="form-group">
+                    <label for="exampleTextarea" style="font-size: 20px;">Write a new comment</label>
+                    <textarea class="form-control" id="comment-body" rows="5" required></textarea>
+                </div>
+                <button class="btn btn-danger mt-2 ml-3" id="submit-comment" style="border-radius: 0px;" type="submit">
+                    Submit Comment
+                </button>
+            </form>
+        </div>
+    }
+
+    @*Existing Comments*@
+    <div class="p-5" id="comment-section">
+        @*Populated using Jquery/Ajax below*@
+    </div>
+</div>
+
+
+
+
+@*JS Link*@
+<script src="~/js/details.js" asp-append-version="true"></script>
+
+@section Scripts {
+    @*General script*@
+    <script>
+        $(document).ready(getLikeCount);
+        $(document).ready(checkIfAlreadyLiked);
+        $(document).ready(getComments);
+
+        $(function () {
+            $("#like").click(newLike)
+        })
+
+        $(function () {
+            $("#unsigned-like").click(likeWarning)
+        })
+
+        function likeWarning() {
+            $("#like-warning").show(0).delay(3000).hide(0);
+        }
+
+
+        function newLike() {
+            var url = "/home/like";
+            $.post(url, { recipeId: @Model.Recipe.Id}, function (data) {
+                $("#like-count").text(data)
+                checkIfAlreadyLiked()
+            })
+        }
+
+        function getLikeCount() {
+            var url = "/home/getLikeCount";
+            $.get(url, { recipeId: @Model.Recipe.Id}, function (data) {
+                $("#like-count").text(data)
+        })
+        }
+
+        function checkIfAlreadyLiked() {
+            var url = "/home/checkIfAlreadyLiked";
+            $.get(url, { recipeId : @Model.Recipe.Id}, function (data) {
+                if (data === "yes") {
+                    fullHeart();
+                } else {
+                    hollowHeart();
+                }
+            })
+        }
+
+        function fullHeart() {
+            $("#like").attr("src", "@fullHeartUrl");
+        }
+
+        function hollowHeart() {
+            $("#like").attr("src", "@hollowHeartUrl")
+        }
+
+        function getComments() {
+            var commentSection = $("#comment-section");
+            commentSection.empty();
+            var url = "/comment/GetAll";
+            var comments;
+            $.get(url, { recipeId: @Model.Recipe.Id}, function (data) {
+                comments = JSON.parse(data);
+                $.map(comments, function (comment) {
+                    var sameUser = "none";
+                    if ("@signInManager.IsSignedIn(User).ToString()" == "True") {
+                        if ("@currentUser" == comment.ApplicationUserId) {
+                            sameUser = "";
+                        }
+                    }
+                    console.log(comment)
+                    var dateCreated = comment.CreatedOn.split("T")
+                    var date = dateCreated[0] + " | ";
+                    var time = dateCreated[1].substr(0, 8);
+                    var commentSection = $("#comment-section");
+                    var newCommentBox = '<div class="card bg-light mb-3">'
+                        + '<div class="card-header">'
+                        + `<a href="/home/index?searchUser=${comment.ApplicationUserId}">`
+                        + `<img style="height: 25px; width: auto; margin-right: 6px;" src="/images/33638.svg" />`
+                        + `<span>${comment.ApplicationUserName}</span>`
+                        + '</a>'
+                        + '<span> wrote</span>'
+                        + `<a class="btn btn-danger mr-2 text-white deleteComment" id="${comment.Id}" type="submit" style="position: absolute; right: 0; margin-top: -5px; display: ${sameUser}">Delete Comment</a>`
+                        + '</div>'
+                        + '<div class="card-body">'
+                        + `<p class="card-text" style="white-space: pre-line">${comment.Body}</p>`
+                        + `<p style="font-size: 15px;"><span class="badge badge-dark">${date + time}</span ></span ></p >`
+                        + '</div>'
+                        + '</div>';
+                    commentSection.append(newCommentBox);
+                })
+            })
+        }
+    </script>
+
+    @*This script is only used when a user is logged in*@
+    @if (signInManager.IsSignedIn(User))
+    {
+        <script>
+             $(function () {
+            $("#submit-comment").click(function (e) {
+                e.preventDefault();
+                var comment = $("#comment-body").val();
+                if (comment == "") {
+                    alert("Please fill the comment text box to submit a new comment!");
+                } else {
+                    newComment()
+                }
+            })
+        })
+
+        function goToBottom() {
+            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        };
+
+        function reloadPage() {
+            document.location.reload(true);
+        }
+
+        function newComment() {
+            var url = "/comment/create";
+            var newCommentBody = $("#comment-body").val();
+            $.post(
+                url,
+                { commentBody: newCommentBody, recipeId: @Model.Recipe.Id, applicationUserId: "@signInManager.UserManager.GetUserAsync(User).Result.Id" },
+                function (data) {
+                    var newComment = JSON.parse(data);
+                    var commentSection = $("#comment-section");
+                    var dateCreated = newComment.commentCreatedOn.split("T")
+                    var date = dateCreated[0] + " | ";
+                    var time = dateCreated[1].substr(0, 8);
+                    var newCommentDiv = '<div class="card bg-light mb-3">'
+                        + '<div class="card-header">'
+                        + `<a href="/home/index?searchUser=${newComment.userId}">`
+                        + `<img style="height: 25px; width: auto; margin-right: 6px;" src="/images/33638.svg" />`
+                        + `<span>${newComment.userName}</span>`
+                        + '</a>'
+                        + '<span> wrote</span>'
+                        + `<a class="btn btn-danger mr-2 text-white deleteComment" id=${newComment.commentId} style="position: absolute; right: 0; margin-top: -5px;">Delete Comment</a>`
+                        + '</div>'
+                        + '<div class="card-body">'
+                        + `<p class="card-text" style="white-space: pre-line">${newComment.commentBody}</p>`
+                        + `<p style="font-size: 15px;"><span class="badge badge-dark">${date + time}</span ></span ></p >`
+                        + '</div>'
+                        + '</div>';
+                    commentSection.append(newCommentDiv);
+                    $("#comment-body").val('');
+                    goToBottom();
+            })
+        }
+
+        </script>
+    }
+
+    @*Script to handle deleting comments*@
+    <script>
+        $(document).on('click', '.deleteComment', function () {
+            console.log("zew")
+            if (confirm('Are you sure you want to delete this comment?')) {
+                var url = "/comment/delete"
+                $.post(
+                    url,
+                    { commentId: this.id },
+                    function () {
+                        getComments()
+                    }
+                )
+            }
+        })
+
+    </script>
+}

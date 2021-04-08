@@ -1,0 +1,23 @@
+﻿
+
+.recipe-title {
+    margin-top: 1em;
+    font-size: 40px;
+    text-align: center;
+}
+
+hr {
+    border: 0.2px #ddd solid;
+}
+
+.recipe-image {
+    width: 100%;
+    height: auto;
+    max-height: 25em;
+    max-width: 25em;
+}
+
+.ingredient-single {
+    font-size: 13px;
+    line-height: 13px;
+}

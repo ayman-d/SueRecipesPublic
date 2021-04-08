@@ -1,0 +1,210 @@
+﻿@model EditRecipeViewModel;
+
+@{
+    ViewData["Title"] = "Edit Recipe";
+    @*var imagePath = "~/images" + (Model.ExistingImagePath ?? "recipe2.jpg");*@
+}
+
+    <div class="container m-auto" style="background-color: white;">
+        <form enctype="multipart/form-data" asp-controller="Home" asp-action="EditRecipe" method="post">
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input hidden asp-for="@Model.Id" />
+            <input hidden asp-for="@Model.ExistingImagePath" />
+
+            <div class="form-group">
+                <label asp-for="Title">Recipe Title</label>
+                <input asp-for="Title" type="text" placeholder="@Model.Title" class="form-control" />
+                <span asp-validation-for="Title" class="badge badge-danger"></span>
+            </div>
+
+            <br />
+
+            <div class="form-group row container">
+                <label asp-for="Image" class="col-form-label"></label>
+                <div class="col-sm-4">
+                    <div class="custom-file">
+                        <input asp-for="Image" class="form-control custom-file-input" />
+                        <label class="custom-file-label">Choose File...</label>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="form-group">
+                <label asp-for="Description">Recipe Description</label>
+                <textarea asp-for="Description" type="text" value="" class="form-control-plaintext p-2" rows="2" style="border: 1px solid #ccc; border-radius: 6px;"></textarea>
+                <span asp-validation-for="Description" class="badge badge-danger"></span>
+            </div>
+
+            <h4>Add Ingredients</h4>
+
+            <div class="form-group container" id="item-list">
+                @for (int i = 0; i < Model.Ingredients.Count; i++)
+                {
+
+                    <div class="row justify-content-between mb-2 ingredient-row" id="item-list-inner">
+                        <input asp-for="Ingredients[i].Measure" type="text" class="items col-3" />
+                        <select asp-for="Ingredients[i].Unit" class="custom-select col-5">
+                            <option></option>
+                            <option>Cup</option>
+                            <option>Tea_Spoon</option>
+                            <option>Table_Spoon</option>
+                            <option>Piece</option>
+                            <option>Fluid_Ounce</option>
+                            <option>Milli_Litre</option>
+                            <option>Litre</option>
+                            <option>Pound</option>
+                            <option>Ounce</option>
+                            <option>Milli_Gram</option>
+                            <option>Gram</option>
+                            <option>Kilo_Gram</option>
+                        </select>
+                        <input asp-for="Ingredients[i].Name" type="text" class="items col-3" />
+                    </div>
+
+                }
+            </div>
+
+
+            <a href="#" id="add">Add</a>
+            <a href="#" id="remove">Remove</a>
+            <div id="add-warning" class="p-2 mt-3" style="height: 45px; line-height: 15px; background-color: #f38185; color: white;
+            border-radius: 5px;  display: none; width: max-content; font-size: 20px;">Please fill all the fields of the previous ingredient before creating a new one.</div>
+
+            <hr />
+
+            <div class="form-group">
+                <label asp-for="Instructions">Recipe Instructions</label>
+                <textarea asp-for="Instructions" type="text" value="" class="form-control-plaintext p-2" rows="10" style="border: 1px solid #ccc; border-radius: 6px;"></textarea>
+                <span asp-validation-for="Instructions" class="badge badge-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MealType">Meal Type</label>
+                <select asp-for="MealType" class="custom-select" asp-items="Html.GetEnumSelectList<MealType>()">
+                    <option value=""></option>
+                </select>
+                <span asp-validation-for="MealType" class="badge badge-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Category">Meal Category</label>
+                <select asp-for="Category" class="custom-select" asp-items="Html.GetEnumSelectList<Category>()">
+                    <option value=""></option>
+                </select>
+                <span asp-validation-for="Category" class="badge badge-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SpiceLevel">Spice Level</label>
+                <select asp-for="SpiceLevel" class="custom-select">
+                    <option></option>
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+                <span asp-validation-for="Servings" class="badge badge-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Servings">Number of servings</label>
+                <select asp-for="Servings" class="custom-select">
+                    <option></option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+                </select>
+                <span asp-validation-for="Servings" class="badge badge-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PrepTime">Prep Time</label>
+                <input asp-for="PrepTime" placeholder="Enter prep time in minutes" type="text" value="@Model.PrepTime" class="form-control" />
+                <span asp-validation-for="PrepTime" class="badge badge-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CookTime">Cook Time</label>
+                <input asp-for="CookTime" placeholder="Enter cook time in minutes" type="text" value="@Model.CookTime" class="form-control" />
+                <span asp-validation-for="CookTime" class="badge badge-danger"></span>
+            </div>
+
+            <button class="btn btn-outline-primary" id="submit-button" type="submit">Edit Recipe</button>
+
+        </form>
+    </div>
+
+
+@section Scripts {
+    <script>
+        var ingredientNumber;
+        $(document).ready(function () {
+            ingredientNumber = @Model.Ingredients.Count-1;
+        })
+
+        $(function () {
+            $("#submit-button").click(function (e) {
+                var newMeasure = $('#Ingredients_' + ingredientNumber + '__Measure');
+                var newUnit = $('#Ingredients_' + ingredientNumber + '__Unit')
+                var newName = $('#Ingredients_' + ingredientNumber + '__Name')
+                if (newMeasure[0].value == "" || newUnit[0].value == "" || newName[0].value == "") {
+                    e.preventDefault()
+                    alert("Please fill all the fields of the new ingredient or remove the row entirely.")
+                }
+            })
+        })
+
+        $(function () {
+            $("#add").click(function (e) {
+                e.preventDefault();
+
+                var previousMeasure = $('#Ingredients_' + ingredientNumber + '__Measure');
+                var previousUnit = $('#Ingredients_' + ingredientNumber + '__Unit')
+                var previousName = $('#Ingredients_' + ingredientNumber + '__Name')
+
+                if (previousMeasure.val() == "" || previousUnit.val() == "" || previousName.val() == "") {
+                    $("#add-warning").show(0).delay(5000).hide(0);
+                } else {
+                    ingredientNumber++;
+                    var newLine = '<div class="row justify-content-between mb-2 ingredient-row" id="item-list-inner">' +
+                        '<input type="text" class="items col-3" data-val="true" data-val-number="The field Measure must be a number." data-val-required="The Measure field is required." id="Ingredients_' + ingredientNumber + '__Measure" name="Ingredients[' + ingredientNumber + '].Measure" value="">' +
+                        '<select class="custom-select col-5" data-val="true" data-val-required="The Unit field is required." id="Ingredients_' + ingredientNumber + '__Unit" name="Ingredients[' + ingredientNumber + '].Unit">' +
+                        '<option></option><option>Cup</option><option>Tea_Spoon</option><option>Table_Spoon</option><option>Piece</option><option>Fluid_Ounce</option><option>Milli_Litre</option><option>Litre</option><option>Pound</option><option>Ounce</option><option>Milli_Gram</option><option>Gram</option><option>Kilo_Gram</option></select >' +
+                        '<input type="text" class="items col-3" id="Ingredients_' + ingredientNumber + '__Name" name="Ingredients[' + ingredientNumber + '].Name" value="">' +
+                        '</button>';
+                    $("#item-list").append(newLine);
+                }
+
+
+            });
+        });
+
+        $(function () {
+            $("#remove").click(function (e) {
+                e.preventDefault();
+                $(".ingredient-row").last().remove();
+                if (ingredientNumber < @Model.Ingredients.Count) {
+                    ingredientNumber = @Model.Ingredients.Count
+                } else {
+                    ingredientNumber--;
+                }
+            });
+        })
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $('.custom-file-label').html(fileName);
+            });
+        });
+    </script>
+
+}

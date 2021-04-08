@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "boosted@5.0.0-alpha1",
+      "destination": "wwwroot/lib/boosted/",
+      "files": [
+        "js/bootstrap.bundle.min.js"
+      ]
+    },
+    {
+      "library": "bootswatch@4.5.0",
+      "destination": "wwwroot/lib/bootswatch/",
+      "files": [
+        "yeti/bootstrap.css",
+        "yeti/bootstrap.min.css"
+      ]
+    }
+  ]
+}

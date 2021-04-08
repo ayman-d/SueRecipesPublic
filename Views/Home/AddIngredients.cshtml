@@ -1,0 +1,65 @@
+﻿@*@model AddIngredientsModel;
+
+@{
+    ViewData["Title"] = "Add Ingredients";
+}
+
+
+<form enctype="multipart/form-data" asp-controller="Home" asp-action="AddIngredients" method="post">
+
+    <hr />
+
+    <h4>Add Ingredients</h4>
+
+    <div class="form-group" id="item-list">
+        <div class="row justify-content-between">
+            <input asp-for="Ingredients[0].Measure" type="text" class="items col-3" />
+            <select asp-for="Ingredients[0].Unit" class="custom-select col-5">
+                <option></option>
+                <option>Cup</option>
+                <option>Tea_Spoon</option>
+                <option>Table_Spoon</option>
+            </select>
+            <input asp-for="Ingredients[0].Name" type="text" class="items col-3" />
+        </div>
+    </div>
+
+    <a href="#" id="add">Add</a>
+
+    <hr />
+
+    <button class="btn btn-outline-secondary" type="submit">Add Ingredients</button>
+
+</form>
+
+
+@section Scripts {
+
+    <script>
+
+        var ingredientNumber;
+
+        $(document).ready(function () {
+            ingredientNumber = 0;
+        })
+
+        $(function () {
+            $("#add").click(function (e) {
+                e.preventDefault();
+                ingredientNumber++;
+                var newLine = '<br/>' + '<div class="row justify-content-between">' +
+                    '<input type="text" class="items col-3" data-val="true" data-val-number="The field Measure must be a number." data-val-required="The Measure field is required." id="Ingredients_' + ingredientNumber + '__Measure" name="Ingredients[' + ingredientNumber + '].Measure" value="">' +
+                    '<select class="custom-select col-5" data-val="true" data-val-required="The Unit field is required." id="Ingredients_' + ingredientNumber + '__Unit" name="Ingredients[' + ingredientNumber + '].Unit">' +
+                    '<option></option><option>Cup</option><option>Tea_Spoon</option><option>Table_Spoon</option></select >' +
+                    '<input type="text" class="items col-3" id="Ingredients_' + ingredientNumber + '__Name" name="Ingredients[' + ingredientNumber + '].Name" value="">' +
+                    '</div>';
+
+                $("#item-list").append(newLine);
+                console.log(ingredientNumber);
+            });
+
+        });
+    </script>
+
+
+}*@

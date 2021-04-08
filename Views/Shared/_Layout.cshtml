@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sue Recipes</title>
+    <link href="~/lib/bootswatch/yeti/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rowdies&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">B
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-5 fixed-top" style="min-height: 100px;">
+            <div class="container">
+                <a class="navbar-brand text-white font-weight-bold" asp-area="" asp-controller="Home" asp-action="Index">SueRecipes</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    @* left side of the navigation bar *@
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <button class="nav-link text-white font-weight-bold btn btn-warning" id="top-button" style="border-radius: 50%;">
+                                <img style="height:30px; width: auto; color: black;" src="~/images/arrow.png" />
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                @* right side of the navigation bar *@
+
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    @if (signInManager.IsSignedIn(User))
+                    {
+                        <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <div class="btn-group mt-1" role="group" aria-label="Button group with nested dropdown">
+                                    <button type="button" class="btn btn-primary">Hi @signInManager.UserManager.GetUserAsync(User).Result.Name</button>
+                                    <div class="btn-group" role="group">
+                                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
+                                            <a class="dropdown-item" asp-action="create" asp-controller="home">New Recipe</a>
+                                            <a class="dropdown-item" asp-action="userrecipes" asp-controller="home"
+                                               asp-route-userId="@signInManager.UserManager.GetUserAsync(User).Result.Id">My Recipes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <div class="nav-item mt-1 ml-2">
+                                <form method="post" class="form-inline">
+                                    <button type="submit" asp-controller="account" asp-action="logout" class="btn btn-primary text-white font-weight-bold">Logout</button>
+                                </form>
+                            </div>
+
+                        </ul>
+
+                    }
+                    else
+                    {
+                        <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a asp-action="login" asp-route-returnUrl="@Context.Request.Path" asp-controller="account" class="nav-link text-white font-weight-bold">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-action="register" asp-controller="account" class="nav-link text-white font-weight-bold">Register</a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="row" style="margin-top: 130px;">
+        @*<div class="col-xl-12 hero mb-5 text-center" style="height: 100px; padding-top: 0px;">
+                <blockquote class="blockquote">
+                    <p class="mb-0" style="font-family: 'Amatic SC', cursive; font-size: 8vh;">People who love to eat are always the best people.</p>
+                    <footer class="blockquote-footer">Julia Child</footer>
+                </blockquote>
+            </div>*@
+
+        <div class="col-xl-12">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+
+    </div>
+
+    @*<button id="top-button" class="shadow btn btn-primary"
+            style="position: fixed; left: 130px; bottom: 65px; height: 40px; width: auto;">
+        <img style="height:20px; width: auto; color: black;" src="~/images/arrow.png" />
+    </button>*@
+
+    <footer class="border-top footer text-muted">
+        <div class="container" style="background-color: white;">
+            &copy; 2020 - SueRecipes
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/boosted/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        $("#search-box").focus();
+    })
+
+    $(function () {
+        $("#top-button").click(function () {
+            $("html, body").animate({ scrollTop: 0 }, 1000);
+        })
+    })
+
+    $(function () {
+        if ($(window).width() < 1400) {
+            $("#top-button").hide()
+        }
+    })
+
+</script>
